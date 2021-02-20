@@ -29,14 +29,12 @@ module.exports = async (rootDirectory, dataFileName) => {
   fs.mkdirSync(componentsLatestDirectory);
   fs.writeFileSync(path.join(componentsLatestDirectory, 'package.json'), '{}', 'utf-8');
 
-  data.components.forEach(async (component) => {
-    setPackageManager('yarn');
-    setRootDir(componentsLatestDirectory);
-    await install(component.name);
+  setPackageManager('yarn');
+  setRootDir(componentsLatestDirectory);
+  await install(data.components.map((c) => c.name));
 
-    setRootDir(componentsOldDirectory);
-    await install(`${component.name}@${component.installedVersion}`);
-  });
+  setRootDir(componentsOldDirectory);
+  await install(data.components.map((c) => `${c.name}@${c.installedVersion}`));
 
   // Merge components versions, postfixing the installed versions with '-old'
   console.log('Renaming old components...');
