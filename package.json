@@ -1,19 +1,12 @@
 {
   "name": "vf-core-service-discovery-versions-comparison",
   "version": "0.1.0",
-  "description": "",
+  "description": "Runs a comparison of vf-core components' versions",
   "author": "oss6 <ossedb@gmail.com>",
   "license": "MIT",
   "main": "index.js",
   "bin": {
     "vf-core-service-discovery-vc": "./cli.js"
-  },
-  "scripts": {
-    "clean": "rimraf build assets components components-old components-latest",
-    "01-install-components": "node 01-install-components.js",
-    "02-build-assets": "node 02-build-assets.js",
-    "03-fractal": "node 03-fractal.js",
-    "build": "npm-run-all clean \"01-install-components -- {1}\" 02-build-assets 03-fractal --"
   },
   "dependencies": {
     "@frctl/fractal": "^1.5.4",
