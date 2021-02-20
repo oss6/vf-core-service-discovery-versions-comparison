@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" class="vf-no-js">
+<head>
+  <title>{{ _target.title }} | {{ _config.project.title }}</title>
+
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1, minimum-scale=1" name="viewport">
+
+  <link rel="stylesheet" href="{{ '/assets/' + _target.handle.split('--')[0] + '/' + _target.handle.split('--')[0] + '.css' }}">
+</head>
+<body class="vf-body">
+  <div class="vf-grid">
+    <div class="vf-component__container">
+      {{ yield | safe }}
+    </div>
+  </div>
+</body>
+</html>

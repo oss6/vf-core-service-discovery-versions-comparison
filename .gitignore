@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+assets/
+components-old/
+components-latest/
+components/
+data.json
+.DS_Store
