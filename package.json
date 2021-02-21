@@ -1,10 +1,9 @@
 {
   "name": "vf-core-service-discovery-versions-comparison",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Runs a comparison of vf-core components' versions",
   "author": "oss6 <ossedb@gmail.com>",
   "license": "MIT",
-  "type": "module",
   "main": "index.js",
   "bin": {
     "vf-core-service-discovery-vc": "./cli.js"

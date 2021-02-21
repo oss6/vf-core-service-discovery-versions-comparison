@@ -1,13 +1,13 @@
-import fs from 'fs-extra';
-import path from 'path';
-import frctl from '@frctl/fractal';
-import frctlNunjucks from '@frctl/nunjucks';
-import codeblock from '@visual-framework/vf-frctl-extensions/codeblock.js';
-import spaceless from '@visual-framework/vf-frctl-extensions/spaceless.js';
-import markdown from '@visual-framework/vf-frctl-extensions/markdown.js';
-import vfTheme from '@frctl/mandelbrot';
+const fs = require('fs-extra');
+const path = require('path');
+const frctl = require('@frctl/fractal');
+const frctlNunjucks = require('@frctl/nunjucks');
+const codeblock = require('@visual-framework/vf-frctl-extensions/codeblock.js');
+const spaceless = require('@visual-framework/vf-frctl-extensions/spaceless.js');
+const markdown = require('@visual-framework/vf-frctl-extensions/markdown.js');
+const vfTheme = require('@frctl/mandelbrot');
 
-export default async (rootDirectory, logStream) => {
+module.exports = async (rootDirectory, logStream) => {
   const fractal = frctl.create();
 
   fractal.set('project.title', 'vf-core components versions comparison');

@@ -1,17 +1,14 @@
-import fs from 'fs-extra';
-import path from 'path';
-import LMIFY from 'lmify';
-import { fileURLToPath } from 'url';
+const fs = require('fs-extra');
+const path = require('path');
+const LMIFY = require('lmify');
 
-const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export default async (rootDirectory, dataFileName, logStream) => {
+module.exports = async (rootDirectory, dataFileName, logStream) => {
   let data;
 
   if (typeof dataFileName === 'object') {
-    data = JSON.parse(await fs.promises.readFile(dataFileName, 'utf-8'));
-  } else {
     data = JSON.parse(JSON.stringify(dataFileName));
+  } else {
+    data = JSON.parse(await fs.promises.readFile(dataFileName, 'utf-8'));
   }
 
   const buildDirectory = path.join(rootDirectory, 'build');
@@ -101,8 +98,8 @@ export default async (rootDirectory, dataFileName, logStream) => {
   await fs.copy(componentsOldVisualFrameworkDirectory, componentsDirectory);
 
   // Copy preview templates
-  await fs.promises.copyFile(path.join(dirname, '_preview.template.njk'), path.join(componentsDirectory, '_preview.njk'));
-  await fs.promises.copyFile(path.join(dirname, '_preview--nogrid.template.njk'), path.join(componentsDirectory, '_preview--nogrid.njk'));
-  await fs.promises.copyFile(path.join(dirname, '_preview--body.template.njk'), path.join(componentsDirectory, '_preview--body.njk'));
-  await fs.promises.copyFile(path.join(dirname, '_preview--fullhtml.template.njk'), path.join(componentsDirectory, '_preview--fullhtml.njk'));
+  await fs.promises.copyFile(path.join(__dirname, '_preview.template.njk'), path.join(componentsDirectory, '_preview.njk'));
+  await fs.promises.copyFile(path.join(__dirname, '_preview--nogrid.template.njk'), path.join(componentsDirectory, '_preview--nogrid.njk'));
+  await fs.promises.copyFile(path.join(__dirname, '_preview--body.template.njk'), path.join(componentsDirectory, '_preview--body.njk'));
+  await fs.promises.copyFile(path.join(__dirname, '_preview--fullhtml.template.njk'), path.join(componentsDirectory, '_preview--fullhtml.njk'));
 };

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-import { PassThrough } from 'stream';
-import minimist from 'minimist';
-import vfCoreServiceDiscoveryVersionsComparison from './index.js';
+const { PassThrough } = require('stream');
+const minimist = require('minimist');
+const vfCoreServiceDiscoveryVersionsComparison = require('.');
 
 (async () => {
   const argv = minimist(process.argv.slice(2));

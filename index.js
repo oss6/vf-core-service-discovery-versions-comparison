@@ -1,10 +1,10 @@
-import fs from 'fs-extra';
-import path from 'path';
-import rimraf from 'rimraf';
-import { promisify } from 'util';
-import installComponents from './01-install-components.js';
-import buildAssets from './02-build-assets.js';
-import runFractal from './03-fractal.js';
+const fs = require('fs-extra');
+const path = require('path');
+const rimraf = require('rimraf');
+const { promisify } = require('util');
+const installComponents = require('./01-install-components');
+const buildAssets = require('./02-build-assets');
+const runFractal = require('./03-fractal');
 
 const rimrafP = promisify(rimraf);
 
@@ -24,7 +24,7 @@ async function clean(rootDirectory, logStream) {
   }
 }
 
-export default async (rootDirectory, data, logStream) => {
+module.exports = async (rootDirectory, data, logStream) => {
   await clean(rootDirectory, logStream);
   await installComponents(rootDirectory, data, logStream);
   await buildAssets(rootDirectory, logStream);
