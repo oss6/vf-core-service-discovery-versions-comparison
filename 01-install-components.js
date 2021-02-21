@@ -1,9 +1,19 @@
-const fs = require('fs-extra');
-const path = require('path');
-const { install, setRootDir, setPackageManager } = require('lmify');
+import fs from 'fs-extra';
+import path from 'path';
+import LMIFY from 'lmify';
+import { fileURLToPath } from 'url';
 
-module.exports = async (rootDirectory, dataFileName) => {
-  const data = JSON.parse(fs.readFileSync(dataFileName, 'utf-8'));
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export default async (rootDirectory, dataFileName, logStream) => {
+  let data;
+
+  if (typeof dataFileName === 'object') {
+    data = JSON.parse(await fs.promises.readFile(dataFileName, 'utf-8'));
+  } else {
+    data = JSON.parse(JSON.stringify(dataFileName));
+  }
+
   const buildDirectory = path.join(rootDirectory, 'build');
   const componentsOldDirectory = path.join(rootDirectory, 'components-old');
   const componentsOldVisualFrameworkDirectory = path.join(
@@ -18,37 +28,45 @@ module.exports = async (rootDirectory, dataFileName) => {
     '@visual-framework',
   );
 
-  if (!fs.existsSync(buildDirectory)) {
-    fs.mkdirSync(buildDirectory);
-  }
+  await fs.promises.mkdir(buildDirectory);
 
   // Download components
-  console.log('Downloading components...');
-  fs.mkdirSync(componentsOldDirectory);
-  fs.writeFileSync(path.join(componentsOldDirectory, 'package.json'), '{}', 'utf-8');
-  fs.mkdirSync(componentsLatestDirectory);
-  fs.writeFileSync(path.join(componentsLatestDirectory, 'package.json'), '{}', 'utf-8');
+  logStream.push('Downloading components');
+  await fs.promises.mkdir(componentsOldDirectory);
+  await fs.promises.writeFile(path.join(componentsOldDirectory, 'package.json'), '{"private": true}', 'utf-8');
+  await fs.mkdir(componentsLatestDirectory);
+  await fs.promises.writeFile(path.join(componentsLatestDirectory, 'package.json'), '{"private": true}', 'utf-8');
 
-  setPackageManager('yarn');
-  setRootDir(componentsLatestDirectory);
-  await install(data.components.map((c) => c.name));
+  const lmifyInstance = new LMIFY({
+    stdout: 'ignore',
+    packageManager: 'yarn',
+  });
 
-  setRootDir(componentsOldDirectory);
-  await install(data.components.map((c) => `${c.name}@${c.installedVersion}`));
+  logStream.push('Installing latest components');
+  lmifyInstance.setRootDir(componentsLatestDirectory);
+  await lmifyInstance.install(data.components.map((c) => c.name));
+
+  logStream.push('Installing old/used components');
+  lmifyInstance.setRootDir(componentsOldDirectory);
+  await lmifyInstance.install(data.components.map((c) => `${c.name}@${c.installedVersion}`));
 
   // Merge components versions, postfixing the installed versions with '-old'
-  console.log('Renaming old components...');
-  fs.readdirSync(componentsOldVisualFrameworkDirectory).forEach((componentName) => {
+  logStream.push('Renaming old components');
+  const oldComponents = await fs.promises.readdir(componentsOldVisualFrameworkDirectory);
+
+  await Promise.all(oldComponents.map(async (componentName) => {
     const newComponentDirectoryName = path.join(componentsOldVisualFrameworkDirectory, `${componentName}-old`);
 
-    fs.renameSync(
+    await fs.promises.rename(
       path.join(componentsOldVisualFrameworkDirectory, componentName),
       newComponentDirectoryName,
     );
 
-    fs.readdirSync(newComponentDirectoryName)
+    const newComponentDirectory = await fs.promises.readdir(newComponentDirectoryName);
+
+    await Promise.all(newComponentDirectory
       .filter((f) => f.includes(componentName))
-      .forEach((fileName) => {
+      .map(async (fileName) => {
         // eslint-disable-next-line no-useless-escape
         const regex = new RegExp(`(${componentName})\.(.*)`, 'g');
         const matches = regex.exec(fileName);
@@ -59,34 +77,32 @@ module.exports = async (rootDirectory, dataFileName) => {
 
         // TODO: check for .js as well
         if (fileName.endsWith('.config.yml')) {
-          let configContents = fs.readFileSync(path.join(newComponentDirectoryName, fileName), 'utf-8');
+          let configContents = await fs.promises.readFile(path.join(newComponentDirectoryName, fileName), 'utf-8');
 
           configContents = configContents
             .replace(/title: (.*)/g, 'title: $1 (old)')
             .replace(/label: (.*)/g, 'label: $1 (old)');
 
-          fs.writeFileSync(path.join(newComponentDirectoryName, fileName), configContents, 'utf-8');
+          await fs.promises.writeFile(path.join(newComponentDirectoryName, fileName), configContents, 'utf-8');
         }
 
-        fs.renameSync(
+        await fs.promises.rename(
           path.join(newComponentDirectoryName, fileName),
           path.join(newComponentDirectoryName, `${matches[1]}-old.${matches[2]}`),
         );
-      });
-  });
+      }));
+  }));
 
   const componentsDirectory = path.join(rootDirectory, 'components');
 
-  if (!fs.existsSync(componentsDirectory)) {
-    fs.mkdirSync(componentsDirectory);
-  }
+  await fs.promises.mkdir(componentsDirectory);
 
-  fs.copySync(componentsLatestVisualFrameworkDirectory, componentsDirectory);
-  fs.copySync(componentsOldVisualFrameworkDirectory, componentsDirectory);
+  await fs.copy(componentsLatestVisualFrameworkDirectory, componentsDirectory);
+  await fs.copy(componentsOldVisualFrameworkDirectory, componentsDirectory);
 
   // Copy preview templates
-  fs.copyFileSync(path.join(__dirname, '_preview.template.njk'), path.join(componentsDirectory, '_preview.njk'));
-  fs.copyFileSync(path.join(__dirname, '_preview--nogrid.template.njk'), path.join(componentsDirectory, '_preview--nogrid.njk'));
-  fs.copyFileSync(path.join(__dirname, '_preview--body.template.njk'), path.join(componentsDirectory, '_preview--body.njk'));
-  fs.copyFileSync(path.join(__dirname, '_preview--fullhtml.template.njk'), path.join(componentsDirectory, '_preview--fullhtml.njk'));
+  await fs.promises.copyFile(path.join(dirname, '_preview.template.njk'), path.join(componentsDirectory, '_preview.njk'));
+  await fs.promises.copyFile(path.join(dirname, '_preview--nogrid.template.njk'), path.join(componentsDirectory, '_preview--nogrid.njk'));
+  await fs.promises.copyFile(path.join(dirname, '_preview--body.template.njk'), path.join(componentsDirectory, '_preview--body.njk'));
+  await fs.promises.copyFile(path.join(dirname, '_preview--fullhtml.template.njk'), path.join(componentsDirectory, '_preview--fullhtml.njk'));
 };

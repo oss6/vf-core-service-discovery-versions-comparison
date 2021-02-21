@@ -1,24 +1,37 @@
 #!/usr/bin/env node
 /* eslint-disable no-console */
 
-const argv = require('minimist')(process.argv.slice(2));
-const vfCoreServiceDiscoveryVersionsComparison = require('.');
+import { PassThrough } from 'stream';
+import minimist from 'minimist';
+import vfCoreServiceDiscoveryVersionsComparison from './index.js';
 
-function usage() {
-  return 'Usage:\nvf-core-service-discovery-vc -d /path/to/data.json -o /path/to/root/directory';
-}
+(async () => {
+  const argv = minimist(process.argv.slice(2));
 
-if (argv.h || argv.help) {
-  console.log(usage());
-  process.exit(0);
-}
+  function usage() {
+    return 'Usage:\nvf-core-service-discovery-vc -d /path/to/data.json -o /path/to/root/directory';
+  }
 
-if ((!argv.output && !argv.o) || (!argv.data && !argv.d)) {
-  console.error(usage());
-  process.exit(1);
-}
+  if (argv.h || argv.help) {
+    console.log(usage());
+    process.exit(0);
+  }
 
-const rootDirectory = argv.output || argv.o;
-const dataFileName = argv.data || argv.d;
+  if ((!argv.output && !argv.o) || (!argv.data && !argv.d)) {
+    console.error(usage());
+    process.exit(1);
+  }
 
-vfCoreServiceDiscoveryVersionsComparison(rootDirectory, dataFileName);
+  const rootDirectory = argv.output || argv.o;
+  const dataFileName = argv.data || argv.d;
+
+  const logStream = new PassThrough({ encoding: 'utf-8' });
+
+  logStream.on('data', (event) => {
+    console.log(event);
+  });
+
+  await vfCoreServiceDiscoveryVersionsComparison(rootDirectory, dataFileName, logStream);
+
+  logStream.end();
+})();

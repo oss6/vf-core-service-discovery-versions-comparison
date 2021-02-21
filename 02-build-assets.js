@@ -1,15 +1,15 @@
-const fs = require('fs-extra');
-const path = require('path');
+import fs from 'fs-extra';
+import path from 'path';
 
-module.exports = async (rootDirectory) => {
+export default async (rootDirectory, logStream) => {
   const assetsDirectory = path.join(rootDirectory, 'assets');
   const componentsDirectory = path.join(rootDirectory, 'components');
 
-  if (!fs.existsSync(assetsDirectory)) {
-    fs.mkdirSync(assetsDirectory);
-  }
+  fs.promises.mkdir(assetsDirectory);
 
   fs.readdirSync(componentsDirectory).forEach((componentName) => {
+    logStream.push(`Moving ${componentName} assets`);
+
     const componentAssetsDirectory = path.join(assetsDirectory, componentName);
     const componentSourceDirectory = path.join(componentsDirectory, componentName);
 
