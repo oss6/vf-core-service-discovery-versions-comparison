@@ -1,6 +1,6 @@
 {
   "name": "vf-core-service-discovery-versions-comparison",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Runs a comparison of vf-core components' versions",
   "author": "oss6 <ossedb@gmail.com>",
   "license": "MIT",
