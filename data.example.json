@@ -2,16 +2,16 @@
   "vfCoreVersion": "v2.4.6",
   "components": [
     {
-      "name": "@visual-framework/vf-footer",
-      "nameWithoutPrefix": "vf-footer",
-      "installedVersion": "1.0.4",
-      "latestVersion": "1.1.0"
+      "name": "@visual-framework/vf-box",
+      "nameWithoutPrefix": "vf-box",
+      "installedVersion": "2.2.0",
+      "latestVersion": "2.3.0"
     },
     {
-      "name": "@visual-framework/vf-button",
-      "nameWithoutPrefix": "vf-button",
+      "name": "@visual-framework/vf-grid",
+      "nameWithoutPrefix": "vf-grid",
       "installedVersion": "1.0.3",
-      "latestVersion": "1.3.1"
+      "latestVersion": "1.4.0"
     }
   ]
 }

@@ -5,7 +5,7 @@ module.exports = async (rootDirectory, logStream) => {
   const assetsDirectory = path.join(rootDirectory, 'assets');
   const componentsDirectory = path.join(rootDirectory, 'components');
 
-  fs.promises.mkdir(assetsDirectory);
+  await fs.promises.mkdir(assetsDirectory);
 
   fs.readdirSync(componentsDirectory).forEach((componentName) => {
     logStream.push(`Moving ${componentName} assets`);

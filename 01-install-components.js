@@ -31,7 +31,7 @@ module.exports = async (rootDirectory, dataFileName, logStream) => {
   logStream.push('Downloading components');
   await fs.promises.mkdir(componentsOldDirectory);
   await fs.promises.writeFile(path.join(componentsOldDirectory, 'package.json'), '{"private": true}', 'utf-8');
-  await fs.mkdir(componentsLatestDirectory);
+  await fs.promises.mkdir(componentsLatestDirectory);
   await fs.promises.writeFile(path.join(componentsLatestDirectory, 'package.json'), '{"private": true}', 'utf-8');
 
   const lmifyInstance = new LMIFY({

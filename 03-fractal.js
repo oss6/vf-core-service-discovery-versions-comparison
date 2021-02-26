@@ -104,6 +104,4 @@ module.exports = async (rootDirectory, logStream) => {
   await fractalServer.start();
 
   logStream.push(`vf-core components versions comparison is available at ${fractalServer.url}`);
-
-  fractal.watch();
 };
